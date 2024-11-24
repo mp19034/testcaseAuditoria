@@ -98,7 +98,6 @@ public class Main {
         System.out.println("Navegado a YouTube.");
     }
 
-
     private static void loginToYouTube(String email, String password) throws InterruptedException {
         try {
             // Encuentra el botón de inicio de sesión (Login) en la página principal utilizando su ruta XPath.
@@ -139,8 +138,6 @@ public class Main {
         }
     }
 
-
-
     private static void interactWithShorts() throws InterruptedException {
         try {
             // Espera explícita para encontrar el enlace de "Shorts" que sea interactuable
@@ -162,8 +159,6 @@ public class Main {
             System.out.println("Ocurrió un error inesperado: " + e.getMessage());
         }
     }
-
-
 
     public static void fetchChannelName() {
         // Configura un tiempo de espera explícito de 20 segundos para el WebDriver
@@ -192,8 +187,8 @@ public class Main {
         }
     }
 
-
     private static void likeAndDislikeVideo() throws InterruptedException { // Acción: "Like" y "Dislike" del video
+        // Primer bloque try-catch para la acción "Like"
         try {
             // Esperar 5 segundos para asegurar que el botón "Like" esté completamente cargado antes de interactuar con él
             Thread.sleep(5000); // Espera adicional para asegurar carga completa
@@ -207,7 +202,18 @@ public class Main {
             // Llama a la función toggleReaction para realizar la acción de "Like"
             // Valida si ya está la acción de like o no y manda mensaje de confirmación
             toggleReaction(likeButton, "Like");
+        } catch (NoSuchElementException e) {
+            System.out.println("No se encontró el botón 'Like': " + e.getMessage());
+        } catch (TimeoutException e) {
+            System.out.println("Tiempo de espera agotado para el botón 'Like': " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println("El hilo fue interrumpido durante la acción 'Like': " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado durante la acción 'Like': " + e.getMessage());
+        }
 
+        // Segundo bloque try-catch para la acción "Dislike"
+        try {
             // Esperar 5 segundos antes de interactuar con el botón "Dislike" para garantizar que la página cargue correctamente
             Thread.sleep(5000); // Espera antes de interactuar con el botón "Dislike"
 
@@ -219,18 +225,16 @@ public class Main {
 
             // Llama a la función toggleReaction para realizar la acción de "Dislike"
             toggleReaction(dislikeButton, "Dislike");
-
         } catch (NoSuchElementException e) {
-            System.out.println("No se encontró el botón: " + e.getMessage());
+            System.out.println("No se encontró el botón 'Dislike': " + e.getMessage());
         } catch (TimeoutException e) {
-            System.out.println("Tiempo de espera agotado para el botón: " + e.getMessage());
+            System.out.println("Tiempo de espera agotado para el botón 'Dislike': " + e.getMessage());
         } catch (InterruptedException e) {
-            System.out.println("El hilo fue interrumpido: " + e.getMessage());
+            System.out.println("El hilo fue interrumpido durante la acción 'Dislike': " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+            System.out.println("Ocurrió un error inesperado durante la acción 'Dislike': " + e.getMessage());
         }
     }
-
 
     private static void toggleReaction(WebElement button, String actionName) { //ok
         // Verificar el estado actual del botón observando su clase CSS
@@ -288,7 +292,6 @@ public class Main {
             System.out.println("Ocurrió un error inesperado: " + e.getMessage());
         }
     }
-
 
     private static void shareVideo() throws InterruptedException {
         // Intentar encontrar el botón de compartir y hacer clic en él
