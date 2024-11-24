@@ -1,182 +1,323 @@
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
+import org.openqa.selenium.Keys
+import org.openqa.selenium.StaleElementReferenceException
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-
-//manipular el navegador que puedes ocupar este
 import org.openqa.selenium.WebElement;
-
-//usar todos los objetos que estan en el dom del css
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.interactions.Actions;
-
-//el navegador el drive de este
-import org.testng.Assert;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 
 public class Main {
+    // "driver" es la variable principal que controla el navegador web.
+    // La usamos para abrir páginas
+    private static WebDriver driver;
+
+    // Es útil cuando las páginas web tardan en cargar o cuando los elementos no están visibles de inmediato.
+    private static WebDriverWait wait;
+
+    // "actions" sirve para realizar acciones más avanzadas en este caso click
+    private static Actions actions;
+
     public static void main(String[] args) {
-
-        System.setProperty("webdriver", "C:\\Users\\Usuario\\Desktop\\Auditoria\\chromedriver-win64\\chromedriver-win64");
-        //agg el path donde esta el chrome
-        // Opciones de Chrome
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized"); // Maximizar ventana
-        options.addArguments("--disable-popup-blocking"); // Deshabilitar bloqueadores de pop-ups
-        WebDriver driver = new ChromeDriver(options);
-
-        WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(20));
-        Actions actions = new Actions(driver);
+        setupDriver();
+        // Configura el controlador del navegador (WebDriver) realiza cualquier configuración inicial necesaria para ejecutar el script de automatización.
 
         try {
-            // Navegar a YouTube
-            driver.get("https://www.youtube.com");
-            Thread.sleep(2000);  // 10000 milisegundos = 10 segundos
-            System.out.println("Esperando 5 segundos...");
+            navigateToYouTube();
+            // Invocamos el metodo para iniciar la pagina de youtube
 
-            //accedemos a cuenta:/html/body/ytd-app/div[1]/div[2]/ytd-masthead/div[4]/div[3]/div[2]/ytd-button-renderer/yt-button-shape/a/yt-touch-feedback-shape/div
-            // Localizar el elemento "Shorts"
-            WebElement login = driver.findElement(By.xpath("/html/body/ytd-app/div[1]/div[2]/ytd-masthead/div[4]/div[3]/div[2]/ytd-button-renderer/yt-button-shape/a/yt-touch-feedback-shape/div"));
+            loginToYouTube("pruebauditoria24@gmail.com", "prueba123");
+            // Inicia sesión en YouTube utilizando las credenciales proporcionadas.
+            //email: "pruebauditoria24@gmail.com" password: "prueba123"
 
-            // Interactuar con el elemento "Shorts"
-            login.click();
+            interactWithShorts();
+            // Interactúa con los videos en la sección "Shorts" de YouTube la accion de el button de short.
 
-            Thread.sleep(2000);  // 10000 milisegundos = 10 segundos
-            System.out.println("Esperando 5 segundos...");
+            fetchChannelName();
+            // este metodo obtiene y muestra el nombre del canal del video actual.
 
-            WebElement searchBox = driver.findElement(By.id("identifierId")); //buscamos xpath este
-            searchBox.sendKeys("pruebauditoria24@gmail.com");
-            //le ingresamo un valor a buscar dentor de la caja de busqueda
-            searchBox.sendKeys(Keys.RETURN);
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
+            likeAndDislikeVideo();
+            // Este metodo realiza las acciones de "Me gusta" (Like) y "No me gusta" (Dislike) en el short actual,
+            // verificando primero el estado de cada botón.
 
-            // Localizar el campo de contraseña usando el XPath completo
-            WebElement searchPass = driver.findElement(By.xpath("/html/body/div[1]/div[1]/div[2]/c-wiz/div/div[2]/div/div/div/form/span/section[2]/div/div/div[1]/div[1]/div/div/div/div/div[1]/div/div[1]/input"));
+            commentOnVideo();
+            // prueba el button de comentario en el video actual.
 
-// Ingresar la contraseña en el campo
-            searchPass.sendKeys("prueba123");
-
-// Simular presionar la tecla ENTER
-            searchPass.sendKeys(Keys.RETURN);
-
-// Configurar un tiempo de espera implícito después de la acción
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(5));
-
-            //--------------------------------------------------------------------------------------------------------------
-            // Configura el tiempo de espera implícita
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
-            // Localizar el elemento "Shorts"
-            WebElement shortsLink = driver.findElement(By.xpath("//a[@id='endpoint' and @title='Shorts']"));
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            // Interactuar con el elemento "Shorts"
-            actions.moveToElement(shortsLink).click().perform()
-
-            // Esperar por un elemento único en la página de Shorts
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@id='shorts-container']")));
-            System.out.println("Se cargó correctamente la página de Shorts.");
-
-            //--------------------------------------------------------------------------------------------------------------
-            // Espera explícita para asegurarse de que el elemento sea visible
-            WebElement channelNameElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.cssSelector(".yt-core-attributed-string__link") // Usamos el selector CSS
-            ));
-
-            // Obtener el texto del nombre del canal
-            String channelName = channelNameElement.getText();
-            System.out.println("Nombre del canal: " + channelName);
-
-            //--------------------------------------------------------------------------------------------------------------
-            // Espera a que el botón "Like" esté visible
-
-            Thread.sleep(5000); // Esperar 2 segundos
-            // Interactuar con el botón "Like"
-            WebElement likeReact = wait1.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[3]/div[2]/ytd-reel-video-renderer[1]/div[5]/ytd-reel-player-overlay-renderer/div[2]/div/div[1]/ytd-like-button-renderer/ytd-toggle-button-renderer[1]/yt-button-shape/label/button/yt-touch-feedback-shape/div")
-            ));
-
-            // Verificar el estado del botón "Like" basado en su clase
-            String likeClass = likeReact.getAttribute("class");
-
-            if (likeClass.contains("yt-spec-touch-feedback-shape--touch-response-inverse")) {
-                System.out.println("El botón 'Like' ya está activo. No se realiza ninguna acción.");
-            } else {
-                actions.moveToElement(likeReact).click().perform();
-                System.out.println("Se hizo clic en el botón de 'Like' PASS.");
-            }
-
-            Thread.sleep(2000); // Esperar 2 segundos
-
-            // Interactuar con el botón "Dislike"
-            WebElement dislikeReact = wait1.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[3]/div[2]/ytd-reel-video-renderer[1]/div[5]/ytd-reel-player-overlay-renderer/div[2]/div/div[1]/ytd-like-button-renderer/ytd-toggle-button-renderer[2]/yt-button-shape/label/button/yt-touch-feedback-shape/div")
-            ));
-
-            // Verificar el estado del botón "Dislike" basado en su clase
-            String dislikeClass = dislikeReact.getAttribute("class");
-
-            if (dislikeClass.contains("yt-spec-touch-feedback-shape--touch-response-inverse")) {
-                System.out.println("El botón 'Dislike' ya está activo. No se realiza ninguna acción.");
-            } else {
-                actions.moveToElement(dislikeReact).click().perform();
-                System.out.println("Se hizo clic en el botón de 'Dislike' PASS.");
-            }
-
-
-            Thread.sleep(2000);
-
-            // Interactuar con el botón "Comentarios" (usando ID)
-            WebElement commentsReact = wait1.until(ExpectedConditions.elementToBeClickable(
-                    By.id("comments-button")
-            ));
-
-            // Hacemos clic en el botón "Comentarios"
-
-            if (actions.moveToElement(commentsReact).click().perform() != false) {
-                System.out.println("Se hizo clic en el botón de 'Comentarios' PASS.");
-                Thread.sleep(2000); // Esperar 2 segundos
-                // --------------------------------------------------------------------------------------------------------------
-                // Si deseas cerrar la ventana de comentarios después de abrirla, puedes hacerlo usando un botón de cierre
-                WebElement closeButton = wait1.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[4]/div[2]/ytd-engagement-panel-section-list-renderer[1]/div[1]/ytd-engagement-panel-title-header-renderer/div[3]/div[6]/ytd-button-renderer/yt-button-shape/button/yt-touch-feedback-shape/div") // Reemplazar por el XPath adecuado
-                ));
-                closeButton.click();
-                System.out.println("Se cerró la ventana de 'Comentarios'.");
-            } else {
-                System.out.println("No paso.");
-            }
-
-
-            //compartir: /html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[3]/div[2]/ytd-reel-video-renderer[17]/div[5]/ytd-reel-player-overlay-renderer/div[2]/div/div[3]/ytd-button-renderer/yt-button-shape/label/button/yt-touch-feedback-shape/div
-            //*[@id="share-button"]/ytd-button-renderer/yt-button-shape/label/button/yt-touch-feedback-shape/div/div[2]
-            // Interactuar con el botón "Compartir"
-            WebElement shareReact = wait1.until(ExpectedConditions.elementToBeClickable(
-                    By.id("share-button") // ID del botón "Compartir"
-            ));
-            shareReact.click(); // Hacemos clic en el botón
-            System.out.println("Se hizo clic en el botón de 'Compartir' PASS.");
-
-
-// Localizar el botón "Cerrar" dentro del panel de compartir
-            WebElement closeButton = wait1.until(ExpectedConditions.elementToBeClickable(
-                    By.cssSelector("#button > yt-icon > span > div > svg") // XPath ajustado para el botón de cerrar
-            ));
-// Hacemos clic en el botón de cerrar
-            actions.moveToElement(closeButton).click().perform();
-            System.out.println("Se cerró la ventana de 'Compartir'.");
-
-
-
-            Thread.sleep(10000);  // 10000 milisegundos = 10 segundos
-            System.out.println("Esperando 10 segundos...");
+            shareVideo();
+            // prueba la funcionalidad de el button compartir de YouTube.
 
         } catch (Exception e) {
             e.printStackTrace();
+            // Si ocurre algún error durante la ejecución, imprime los detalles del error en la consola.
+
         } finally {
-            // Cierra el navegador
+            // Pausa la ejecución durante 10 segundos para permitir que la página cargue completamente.
+            // (Thread.sleep no es la mejor práctica para manejar tiempos de espera, pero es funcional en este caso simple).
+            Thread.sleep(10000); //esperamos unos segundos antes de finalizar
+
             driver.quit();
+            // Cierra el navegador al final de la ejecución, independientemente de si el script fue exitoso o no.
+        }
+
+    }
+
+    //creamos los metodos
+    private static void setupDriver() { //metodo de el driver adonde vamos a correr el navegador
+        // Esto permite a Selenium controlar Google Chrome.
+        System.setProperty("webdriver", "C:\\Users\\Usuario\\Desktop\\Auditoria\\chromedriver-win64\\chromedriver-win64");
+
+        // Cree una instancia de opciones para Chrome. Estas opciones permiten configurar el navegador antes de que se inicie.
+        ChromeOptions options = new ChromeOptions();
+
+        // Configura el navegador para:
+        // 1. Iniciar maximizado (pantalla completa).
+        // 2. Deshabilitar los bloqueadores de ventanas emergentes.
+        options.addArguments("--start-maximized", "--disable-popup-blocking");
+
+        // Inicializa el controlador (driver) con las opciones configuradas para Chrome.
+        driver = new ChromeDriver(options);
+
+        // Configura una espera explícita con un tiempo máximo de 20 segundos para que regrese una respuesta.
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+        // Inicializa la clase "Actions" para realizar interacciones avanzadas con la página en este caso click
+        actions = new Actions(driver);
+    }
+
+    private static void navigateToYouTube() throws InterruptedException { //vamos con el metodo que busca la pagina ingresada
+        // Abre la página en el navegador utilizando el controlador (driver).
+        driver.get("https://www.youtube.com");
+
+        Thread.sleep(3000); //espera de 3 seg
+
+        // Imprime un mensaje confirmando que se ha navegado a YouTube.
+        System.out.println("Navegado a YouTube.");
+    }
+
+
+    private static void loginToYouTube(String email, String password) throws InterruptedException {
+        try {
+            // Encuentra el botón de inicio de sesión (Login) en la página principal utilizando su ruta XPath.
+            WebElement loginButton = driver.findElement(By.xpath("/html/body/ytd-app/div[1]/div[2]/ytd-masthead/div[4]/div[3]/div[2]/ytd-button-renderer/yt-button-shape/a/yt-touch-feedback-shape/div"));
+
+            // Haz clic en el botón para abrir el formulario de inicio de sesión.
+            loginButton.click();
+            System.out.println("Vamos a Log in."); // Mensaje de confirmación en consola.
+            Thread.sleep(2000); // Pausa para esperar a que cargue
+
+            // Encuentra el campo de correo electrónico utilizando su atributo "id".
+            WebElement emailField = driver.findElement(By.id("identifierId"));
+
+            // Escribe el correo electrónico proporcionado y presiona la tecla Enter.
+            emailField.sendKeys(email, Keys.RETURN);
+            System.out.println("Agregando Correo."); // Mensaje de confirmación en consola.
+            Thread.sleep(2000); // Pausa breve para permitir.
+
+            // Encuentra el campo de contraseña utilizando una espera explícita para asegurarte de que esté visible.
+            WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div[1]/div[1]/div[2]/c-wiz/div/div[2]/div/div/div/form/span/section[2]/div/div/div[1]/div[1]/div/div/div/div/div[1]/div/div[1]/input")));
+
+            // Escribe la contraseña proporcionada y presiona la tecla Enter.
+            passwordField.sendKeys(password, Keys.RETURN);
+            System.out.println("Agregando Contraseña."); // Mensaje de confirmación en consola.
+
+            // Breve pausa para finalizar el inicio de sesión.
+            Thread.sleep(2000);
+            System.out.println("Inicio de sesión completado."); // Confirmación final.
+
+        } catch (NoSuchElementException e) {
+            System.out.println("No se encontró un elemento necesario para el inicio de sesión: " + e.getMessage());
+        } catch (TimeoutException e) {
+            System.out.println("Tiempo de espera agotado mientras se esperaba el campo de contraseña: " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println("El hilo fue interrumpido: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado durante el inicio de sesión: " + e.getMessage());
+        }
+    }
+
+
+
+    private static void interactWithShorts() throws InterruptedException {
+        try {
+            // Espera explícita para encontrar el enlace de "Shorts" que sea interactuable
+            WebElement shortsLink = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='endpoint' and @title='Shorts']")));
+
+            // Realiza un clic usando la acción del mouse
+            actions.moveToElement(shortsLink).click().perform();
+
+            // Imprime un mensaje en la consola para confirmar que la interacción fue exitosa
+            System.out.println("Interacción con Shorts completada.");
+
+        } catch (NoSuchElementException e) {
+            System.out.println("No se encontró el enlace de 'Shorts': " + e.getMessage());
+        } catch (TimeoutException e) {
+            System.out.println("Tiempo de espera agotado para encontrar el enlace de 'Shorts': " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println("El hilo fue interrumpido: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+        }
+    }
+
+
+
+    public static void fetchChannelName() {
+        // Configura un tiempo de espera explícito de 20 segundos para el WebDriver
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
+        try {
+            // Espera hasta que el elemento que contiene el nombre del canal sea visible
+            WebElement channelNameElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector(".yt-core-attributed-string__link") // Selector CSS para identificar el nombre del canal
+            ));
+            // Extrae el texto del elemento (nombre del canal) y lo imprime en la consola
+            String channelName = channelNameElement.getText();
+            System.out.println("Nombre del canal: " + channelName);
+        } catch (TimeoutException e) {
+            // Maneja el caso donde el elemento no se encuentra dentro del tiempo especificado
+            System.out.println("No se encontró el elemento del nombre del canal dentro del tiempo especificado.");
+        } catch (NoSuchElementException e) {
+            // Maneja el caso donde el elemento no puede ser localizado
+            System.out.println("No se pudo localizar el elemento del nombre del canal: " + e.getMessage());
+        } catch (StaleElementReferenceException e) {
+            // Maneja el caso donde el elemento ya no es válido en el DOM
+            System.out.println("El elemento del nombre del canal ya no es válido en el DOM: " + e.getMessage());
+        } catch (Exception e) {
+            // Captura cualquier otro error inesperado y lo imprime
+            System.out.println("Ocurrió un error inesperado al obtener el nombre del canal: " + e.getMessage());
+        }
+    }
+
+
+    private static void likeAndDislikeVideo() throws InterruptedException { // Acción: "Like" y "Dislike" del video
+        try {
+            // Esperar 5 segundos para asegurar que el botón "Like" esté completamente cargado antes de interactuar con él
+            Thread.sleep(5000); // Espera adicional para asegurar carga completa
+
+            // Espera explícita hasta que el botón "Like" sea clickeable
+            WebElement likeButton = wait.until(ExpectedConditions.elementToBeClickable(
+                    // Selección del botón "Like" mediante XPath
+                    By.xpath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[3]/div[2]/ytd-reel-video-renderer[1]/div[5]/ytd-reel-player-overlay-renderer/div[2]/div/div[1]/ytd-like-button-renderer/ytd-toggle-button-renderer[1]/yt-button-shape/label/button/yt-touch-feedback-shape/div")
+            ));
+
+            // Llama a la función toggleReaction para realizar la acción de "Like"
+            // Valida si ya está la acción de like o no y manda mensaje de confirmación
+            toggleReaction(likeButton, "Like");
+
+            // Esperar 5 segundos antes de interactuar con el botón "Dislike" para garantizar que la página cargue correctamente
+            Thread.sleep(5000); // Espera antes de interactuar con el botón "Dislike"
+
+            // Espera explícita hasta que el botón "Dislike" sea clickeable
+            WebElement dislikeButton = wait.until(ExpectedConditions.elementToBeClickable(
+                    // Selección del botón "Dislike" mediante XPath
+                    By.xpath("/html/body/ytd-app/div[1]/ytd-page-manager/ytd-shorts/div[3]/div[2]/ytd-reel-video-renderer[1]/div[5]/ytd-reel-player-overlay-renderer/div[2]/div/div[1]/ytd-like-button-renderer/ytd-toggle-button-renderer[2]/yt-button-shape/label/button/yt-touch-feedback-shape/div")
+            ));
+
+            // Llama a la función toggleReaction para realizar la acción de "Dislike"
+            toggleReaction(dislikeButton, "Dislike");
+
+        } catch (NoSuchElementException e) {
+            System.out.println("No se encontró el botón: " + e.getMessage());
+        } catch (TimeoutException e) {
+            System.out.println("Tiempo de espera agotado para el botón: " + e.getMessage());
+        } catch (InterruptedException e) {
+            System.out.println("El hilo fue interrumpido: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+        }
+    }
+
+
+    private static void toggleReaction(WebElement button, String actionName) { //ok
+        // Verificar el estado actual del botón observando su clase CSS
+        String buttonClass = button.getAttribute("class");
+
+        // Si la clase contiene "yt-spec-touch-feedback-shape--touch-response-inverse", significa que el botón ya está activado
+        if (buttonClass.contains("yt-spec-touch-feedback-shape--touch-response-inverse")) {
+            // Si el botón ya está activo, imprime un mensaje indicando que no es necesario hacer clic
+            System.out.println("El botón '" + actionName + "' ya está activo.");
+            Thread.sleep(2000);
+        } else {
+            // Si el botón no está activo, hace clic en él
+            actions.moveToElement(button).click().perform();
+            // Imprime un mensaje indicando que se hizo clic en el botón de la acción correspondiente (Like o Dislike)
+            System.out.println("Se hizo clic en el botón de '" + actionName + "'.");
+        }
+    }
+
+    private static void commentOnVideo() throws InterruptedException { // Acción: seleccionar botón de comentarios y cerrar
+        try {
+            // Esperar hasta que el botón de comentarios sea visible y esté clickeable
+            WebElement commentsButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("comments-button")));
+            if (commentsButton != null) {
+                // Hacer clic en el botón de comentarios
+                actions.moveToElement(commentsButton).click().perform();
+                System.out.println("Comentarios abiertos.");
+            } else {
+                System.out.println("No se encontró el botón de comentarios.");
+                return; // Si no se encuentra el botón, terminamos el método aquí
+            }
+
+            // Pausa de 3 segundos para permitir que los comentarios se carguen
+            Thread.sleep(3000);
+
+            // Esperar hasta que el botón de cierre de comentarios sea visible y esté clickeable
+            WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//ytd-engagement-panel-title-header-renderer//button[contains(@aria-label, 'Cerrar')]")));
+
+            if (closeButton != null) {
+                // Hacer clic en el botón de cerrar comentarios
+                closeButton.click();
+                //texto de confirmacion
+                System.out.println("Comentarios cerrados.");
+            } else {
+                System.out.println("No se encontró el botón de cerrar comentarios.");
+            }
+
+            // Pausa de 3 segundos antes de finalizar el método
+            Thread.sleep(3000);
+
+        } catch (NoSuchElementException e) {
+            System.out.println("No se encontró uno de los elementos esperados: " + e.getMessage());
+        } catch (TimeoutException e) {
+            System.out.println("El tiempo de espera agotado para encontrar un elemento: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+        }
+    }
+
+
+    private static void shareVideo() throws InterruptedException {
+        // Intentar encontrar el botón de compartir y hacer clic en él
+        try {
+            // Esperar a que el botón de compartir sea visible y clickeable
+            WebElement shareButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("share-button")));
+            shareButton.click(); // Hacer clic en el botón de compartir
+            System.out.println("Compartir ventana abierta.");
+
+            // Pausa de 3 segundos para permitir que la ventana de compartir se cargue
+            Thread.sleep(3000);
+
+            // Esperar hasta que el botón de cerrar la ventana de compartir sea visible y clickeable
+            WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".ytd-unified-share-panel-renderer > .yt-icon-shape > div")));
+
+            // Mover el ratón sobre el botón de cerrar y hacer clic en él
+            actions.moveToElement(closeButton).click().perform();
+            System.out.println("Compartir ventana cerrada.");
+
+        } catch (NoSuchElementException e) {
+            // Si no se encuentra el botón de compartir
+            System.out.println("No se encontró el botón de compartir.");
+        } catch (TimeoutException e) {
+            // Si el tiempo de espera se agotó para encontrar el botón
+            System.out.println("Tiempo de espera agotado para encontrar el botón.");
+        } catch (Exception e) {
+            // Captura cualquier otro error inesperado
+            System.out.println("Ocurrió un error: " + e.getMessage());
         }
     }
 }
+
