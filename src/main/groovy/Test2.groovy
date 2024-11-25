@@ -113,6 +113,22 @@ class Test2 extends TestPage{
         }
     }
 
+    private static void toggleReaction(WebElement button, String actionName) { //ok
+        String buttonClass = button.getAttribute("class");
+
+        // Si la clase contiene "yt-spec-touch-feedback-shape--touch-response-inverse", significa que el botón ya está activado
+        if (buttonClass.contains("yt-spec-touch-feedback-shape--touch-response-inverse")) {
+            // Si el botón ya está activo, imprime un mensaje indicando que no es necesario hacer clic
+            System.out.println("El botón '" + actionName + "' ya está activo.");
+            Thread.sleep(2000);
+        } else {
+            // Si el botón no está activo, hace clic en él
+            actions.moveToElement(button).click().perform();
+            // Imprime un mensaje indicando que se hizo clic en el botón de la acción correspondiente (Like o Dislike)
+            System.out.println("Se hizo clic en el botón de '" + actionName + "'.");
+        }
+    }
+
     private static void likeAndDislikeVideo() throws InterruptedException { // Acción: "Like" y "Dislike" del video
 
         try {
@@ -162,22 +178,7 @@ class Test2 extends TestPage{
         }
     }
 
-    private static void toggleReaction(WebElement button, String actionName) { //ok
-        String buttonClass = button.getAttribute("class");
-
-        // Si la clase contiene "yt-spec-touch-feedback-shape--touch-response-inverse", significa que el botón ya está activado
-        if (buttonClass.contains("yt-spec-touch-feedback-shape--touch-response-inverse")) {
-            // Si el botón ya está activo, imprime un mensaje indicando que no es necesario hacer clic
-            System.out.println("El botón '" + actionName + "' ya está activo.");
-            Thread.sleep(2000);
-        } else {
-            // Si el botón no está activo, hace clic en él
-            actions.moveToElement(button).click().perform();
-            // Imprime un mensaje indicando que se hizo clic en el botón de la acción correspondiente (Like o Dislike)
-            System.out.println("Se hizo clic en el botón de '" + actionName + "'.");
-        }
-    }
-
+    // TODO: revisar comment video
     private static void commentOnVideo() throws InterruptedException { // Acción: seleccionar botón de comentarios y cerrar
         try {
             // Esperar hasta que el botón de comentarios sea visible y esté clickeable
@@ -256,11 +257,11 @@ class Test2 extends TestPage{
     @Override
     public void routine(){
         navigateToYoutube()
-        loginToYouTube("user","pwd")
+        loginToYouTube("doej21352@gmail.com","dummyPwd1234")
         interactWithShorts()
         fetchChannelName()
         likeAndDislikeVideo()
-        commentOnVideo()
+//        commentOnVideo()
         shareVideo()
     }
 }

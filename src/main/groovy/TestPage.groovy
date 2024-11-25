@@ -39,7 +39,7 @@ abstract class TestPage {
         } finally {
             // Optionally quit the driver after execution
             if (driver != null) {
-                Thread.sleep(10000);
+                Thread.sleep(5000);
                 driver.quit();
                 System.out.println("Driver closed.");
             }
