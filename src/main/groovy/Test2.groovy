@@ -194,11 +194,11 @@ class Test2 extends TestPage{
             // Pausa de 3 segundos para permitir que los comentarios se carguen
             Thread.sleep(3000);
 
-            // Esperar hasta que el botón de cierre de comentarios sea visible y esté clickeable
-            WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//ytd-engagement-panel-title-header-renderer//button[contains(@aria-label, 'Cerrar')]")));
+            WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("visibility-button")));
 
             if (closeButton != null) {
                 // Hacer clic en el botón de cerrar comentarios
+                // Esperar hasta que el botón de cierre de comentarios sea visible y esté clickeable
                 closeButton.click();
                 //texto de confirmacion
                 System.out.println("Comentarios cerrados.");
@@ -260,7 +260,7 @@ class Test2 extends TestPage{
         interactWithShorts()
         fetchChannelName()
         likeAndDislikeVideo()
-//        commentOnVideo()
+        commentOnVideo()
         shareVideo()
     }
 }
